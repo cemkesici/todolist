@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:todolist/todoadd_page.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      home: MainApp(),
+    );
+  }
 }
 
 class MainApp extends StatefulWidget {
@@ -14,67 +28,63 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   List<String> items = [];
 
-  MainApp myApp = const MainApp();
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'To-Do List',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('To-Do List'),
-        ),
-        body: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              leading: const Icon(Icons.map),
-              title: Text(items[index]),
-              subtitle: Text(items.length.toString()),
-            );
-          },
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Stack(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.home),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.favorite),
-                    onPressed: () {},
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(57, 94, 89, 76),
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                        setState(() {
-                          (items.add("value"));
-                        });
-                      },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('To-Do List'),
+      ),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            leading: const Icon(Icons.map),
+            title: Text(items[index]),
+            subtitle: Text(items.length.toString()),
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.favorite),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                final result = await showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => const AlertDialog(
+                    content: SizedBox(
+                      width: 450,
+                      height: 250,
+                      child: TodoPage(),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.notifications),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.person),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ],
-          ),
+                );
+                if (result != null && result != 'Cancel') {
+                  setState(() {
+                    items.add(result);
+                  });
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: () {},
+            ),
+          ],
         ),
       ),
     );

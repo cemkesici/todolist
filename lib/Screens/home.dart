@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todolist/Screens/settings.dart';
 import 'package:todolist/Screens/todoadd_page.dart';
 import 'package:todolist/constans/colors.dart';
+import 'package:todolist/data/database.dart';
 
 import '../util/todo_tile.dart';
 
@@ -13,12 +15,32 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List toDoList = [];
+  // reference the hivebox
+  final _myBox = Hive.box("myBox");
+  ToDoDataBase db = ToDoDataBase();
+
+  @override
+  void initState() {
+    if (_myBox.get("TODOLIST") == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+    super.initState();
+  }
 
   void checkBoxChanged(int index) {
     setState(() {
-      toDoList[index][1] = !toDoList[index][1];
+      db.toDoList[index][1] = !db.toDoList[index][1];
     });
+    db.updateDatabase();
+  }
+
+  void deleteFunction(int index) {
+    setState(() {
+      db.toDoList.removeAt(index);
+    });
+    db.updateDatabase();
   }
 
   @override
@@ -46,8 +68,9 @@ class _HomeState extends State<Home> {
           );
           if (result != null && result != 'Cancel') {
             setState(() {
-              toDoList.add([result, false]);
+              db.toDoList.add([result, false]);
             });
+            db.updateDatabase();
           }
         },
         child: const Icon(Icons.add),
@@ -55,12 +78,13 @@ class _HomeState extends State<Home> {
       body: DecoratedBox(
         decoration: const BoxDecoration(color: normalYellow),
         child: ListView.builder(
-          itemCount: toDoList.length,
+          itemCount: db.toDoList.length,
           itemBuilder: (BuildContext context, int index) {
             return ToDoTile(
-              taskName: toDoList[index][0],
-              taskCompleted: toDoList[index][1],
+              taskName: db.toDoList[index][0],
+              taskCompleted: db.toDoList[index][1],
               onChanged: (value) => checkBoxChanged(index),
+              deleteFunction: (context) => deleteFunction(index),
             );
           },
         ),

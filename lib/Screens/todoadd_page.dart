@@ -27,7 +27,7 @@ class _TodoPage extends State<TodoPage> {
                 maxLines: null,
                 scrollPhysics: const BouncingScrollPhysics(),
                 decoration: const InputDecoration(
-                  labelText: 'Todo',
+                  hintText: 'Todo',
                 ),
               ),
             ),
